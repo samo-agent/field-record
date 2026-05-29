@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Field Record Prototype</title>
+    <link rel="stylesheet" href="styles.css?v=20260521-spray-label-ocr" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="side-rail" aria-label="Primary navigation">
+        <div class="brand">
+          <span class="brand-mark">FR</span>
+          <span>
+            <strong>Field Record</strong>
+            <small>crop input history</small>
+          </span>
+        </div>
+        <nav class="rail-nav">
+          <button data-route="home" class="nav-item active">Home</button>
+          <button data-route="field-history" class="nav-item">Fields</button>
+          <button data-route="office-review" class="nav-item">Office Review</button>
+          <button data-route="data-center" class="nav-item">Data Center</button>
+          <button data-route="data-dictionary" class="nav-item">Dictionary</button>
+          <button data-route="reports" class="nav-item">Reports</button>
+          <button data-route="fuel" class="nav-item">Fuel</button>
+          <button data-route="outbound" class="nav-item">Loads</button>
+          <button data-route="scout-view" class="nav-item">Scout View</button>
+          <button data-route="admin" class="nav-item">Admin</button>
+        </nav>
+        <div class="sync-status">
+          <span class="status-dot"></span>
+          <span>Offline-ready draft mode</span>
+        </div>
+      </aside>
+
+      <main class="workspace">
+        <section class="phone-stage" aria-label="Clickable phone prototype">
+          <div class="phone-frame">
+            <div class="phone-top">
+              <span>Field Record</span>
+              <span id="mockClock">8:42 AM</span>
+            </div>
+            <div id="app" class="phone-screen" aria-live="polite"></div>
+            <nav class="bottom-nav" aria-label="Phone navigation">
+              <button data-route="home">Home</button>
+              <button data-route="field-history">Fields</button>
+              <button data-route="office-review">Review</button>
+              <button data-route="data-center">Data</button>
+              <button data-route="admin">Admin</button>
+            </nav>
+          </div>
+        </section>
+
+        <section class="context-panel" aria-label="Prototype notes">
+          <div class="panel-heading">
+            <p class="eyebrow">Click-through prototype</p>
+            <h1>Crop input records without the clutter</h1>
+            <p>
+              This face is built around fast field entry first, with the deeper history,
+              compliance, and dashboard data gathering itself in the background.
+            </p>
+          </div>
+
+          <div class="insight-grid">
+            <article>
+              <span class="mini-label">Entry goal</span>
+              <strong>Save a spray or fertilizer record in under one minute.</strong>
+            </article>
+            <article>
+              <span class="mini-label">Compliance</span>
+              <strong>Keep chemical records, label snapshots, photos, and REI forever.</strong>
+            </article>
+            <article>
+              <span class="mini-label">Maps</span>
+              <strong>Store field boundaries, treated areas, GPS tracks, and pass pattern.</strong>
+            </article>
+            <article>
+              <span class="mini-label">Roles</span>
+              <strong>Operators enter records. Scouts see REI and history. You see the dashboard.</strong>
+            </article>
+          </div>
+
+          <div class="workflow-strip">
+            <span>Field</span>
+            <span>Area</span>
+            <span>Pattern</span>
+            <span>Product</span>
+            <span>Weather</span>
+            <span>Save</span>
+            <span>Fuel</span>
+            <span>Loads</span>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="app.js?v=20260521-spray-label-ocr"></script>
+  </body>
+</html>
