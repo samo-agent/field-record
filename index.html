@@ -1,100 +1,523 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Field Record Prototype</title>
-    <link rel="stylesheet" href="styles.css?v=20260521-spray-label-ocr" />
-  </head>
-  <body>
-    <div class="app-shell">
-      <aside class="side-rail" aria-label="Primary navigation">
-        <div class="brand">
-          <span class="brand-mark">FR</span>
-          <span>
-            <strong>Field Record</strong>
-            <small>crop input history</small>
-          </span>
-        </div>
-        <nav class="rail-nav">
-          <button data-route="home" class="nav-item active">Home</button>
-          <button data-route="field-history" class="nav-item">Fields</button>
-          <button data-route="office-review" class="nav-item">Office Review</button>
-          <button data-route="data-center" class="nav-item">Data Center</button>
-          <button data-route="data-dictionary" class="nav-item">Dictionary</button>
-          <button data-route="reports" class="nav-item">Reports</button>
-          <button data-route="fuel" class="nav-item">Fuel</button>
-          <button data-route="outbound" class="nav-item">Loads</button>
-          <button data-route="scout-view" class="nav-item">Scout View</button>
-          <button data-route="admin" class="nav-item">Admin</button>
-        </nav>
-        <div class="sync-status">
-          <span class="status-dot"></span>
-          <span>Offline-ready draft mode</span>
-        </div>
-      </aside>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brief — Field Record — SPEC v0.3 (v0.3)</title>
+<style>:root {
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --fs: 15px; --lh: 1.5rem; --measure: 88ch;
+  --paper: #faf7f0; --paper-2: #f3efe4; --paper-3: #ebe6d6;
+  --ink: #1a1714; --ink-2: #4a443c; --ink-3: #847b6a;
+  --rule: #d8d0bc; --rule-2: #c2b89e;
+  --grid: rgba(26,23,20,0.045);
+  --accent: #1f6f3f; --accent-soft: #e6f0e0;
+  --ok: #1f6f3f; --ok-bg: #e6f0e0;
+  --warn: #a85a07; --warn-bg: #f5e8d0;
+  --bad: #9b2226; --bad-bg: #f3dfdc;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #14110d; --paper-2: #1c1814; --paper-3: #25201a;
+    --ink: #ece4d3; --ink-2: #b9b0a0; --ink-3: #7a7263;
+    --rule: #2f2a23; --rule-2: #423c33;
+    --grid: rgba(236,228,211,0.04);
+    --accent: #6fcf8a; --accent-soft: #1d2c20;
+    --ok: #6fcf8a; --ok-bg: #1d2c20;
+    --warn: #e0a14a; --warn-bg: #2c2317;
+    --bad: #e07a7d; --bad-bg: #2a1c1c;
+  }
+}
+[data-theme="dark"] {
+  --paper: #14110d; --paper-2: #1c1814; --paper-3: #25201a;
+  --ink: #ece4d3; --ink-2: #b9b0a0; --ink-3: #7a7263;
+  --rule: #2f2a23; --rule-2: #423c33;
+  --grid: rgba(236,228,211,0.04);
+  --accent: #6fcf8a; --accent-soft: #1d2c20;
+  --ok: #6fcf8a; --ok-bg: #1d2c20;
+  --warn: #e0a14a; --warn-bg: #2c2317;
+  --bad: #e07a7d; --bad-bg: #2a1c1c;
+}
+[data-theme="light"] {
+  --paper: #faf7f0; --paper-2: #f3efe4; --paper-3: #ebe6d6;
+  --ink: #1a1714; --ink-2: #4a443c; --ink-3: #847b6a;
+  --rule: #d8d0bc; --rule-2: #c2b89e;
+  --grid: rgba(26,23,20,0.045);
+  --accent: #1f6f3f; --accent-soft: #e6f0e0;
+  --ok: #1f6f3f; --ok-bg: #e6f0e0;
+  --warn: #a85a07; --warn-bg: #f5e8d0;
+  --bad: #9b2226; --bad-bg: #f3dfdc;
+}
+*,*::before,*::after { box-sizing: border-box; }
+html,body { margin: 0; padding: 0; }
+body {
+  font-family: var(--mono);
+  font-size: var(--fs); line-height: var(--lh);
+  color: var(--ink); background: var(--paper);
+  text-rendering: optimizeLegibility;
+  background-image: linear-gradient(
+    to bottom,
+    transparent calc(var(--lh) - 1px),
+    var(--grid) calc(var(--lh) - 1px)
+  );
+  background-size: 100% var(--lh);
+}
+::selection { background: var(--accent); color: var(--paper); }
+a { color: var(--ink); text-decoration: underline; text-underline-offset: 0.18em;
+    text-decoration-thickness: 1px; text-decoration-color: var(--rule-2); }
+a:hover { color: var(--accent); text-decoration-color: var(--accent); }
+p,ul,ol,pre,details { margin: 0 0 var(--lh); }
+ul { padding-left: 3ch; list-style: none; }
+ul > li::before { content: "\2500\00a0"; color: var(--ink-3);
+                  margin-left: -3ch; display: inline-block; width: 3ch; }
+ol { padding-left: 3ch; }
+li { margin: 0; }
+strong,b { font-weight: 700; }
+em,i { font-style: normal; color: var(--accent); }
+code,samp {
+  font-family: var(--mono); font-size: 0.92em;
+  background: var(--paper-2); border: 1px solid var(--rule);
+  padding: 0 0.4ch; border-radius: 2px;
+}
+pre code { background: none; border: 0; padding: 0; font-size: 1em; }
+h1,h2,h3 { font-weight: 700; margin: 0 0 var(--lh); line-height: var(--lh); }
+h1 { font-size: 1.8rem; line-height: calc(var(--lh) * 2); }
+h2 { font-size: 1.1rem; }
+h3 { font-size: 1rem; color: var(--ink-2); font-weight: 600; }
+/* reading progress */
+.progress {
+  position: fixed; top: 0; left: 0; right: 0; height: 2px;
+  z-index: 60; background: transparent; pointer-events: none;
+}
+.progress > i { display: block; height: 100%; width: 0%;
+                background: var(--accent); transition: width 80ms linear; }
+/* sticky metabar */
+.metabar {
+  position: sticky; top: 0; z-index: 50;
+  background: var(--paper); border-bottom: 1px solid var(--rule);
+}
+.metabar-row {
+  max-width: var(--measure); margin: 0 auto; padding: 0 2ch;
+  display: flex; align-items: center;
+  height: calc(var(--lh) * 2); font-size: 0.85rem; gap: 2ch;
+}
+.metabar-left { display: flex; align-items: center; flex: 1 1 auto;
+                min-width: 0; white-space: nowrap; overflow: hidden; }
+.metabar-left .brand { font-weight: 700; color: var(--ink); padding-right: 1.5ch; }
+.metabar-left .chip { color: var(--ink-2); padding: 0 1.5ch;
+                      border-left: 1px solid var(--rule); }
+.metabar-left .chip b { color: var(--ink); font-weight: 600; }
+.metabar-right { display: flex; align-items: center; gap: 1.5ch; flex: 0 0 auto; }
+.metabar .status { color: var(--ink-3); white-space: nowrap; }
+.theme-sw { display: inline-flex; border: 1px solid var(--rule-2);
+            border-radius: 3px; overflow: hidden;
+            height: calc(var(--lh) * 1.1); }
+.theme-sw button {
+  background: transparent; border: 0; border-right: 1px solid var(--rule);
+  cursor: pointer; font-family: var(--mono); font-size: 0.95rem;
+  color: var(--ink-3); padding: 0 1.1ch;
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 3ch;
+}
+.theme-sw button:last-child { border-right: 0; }
+.theme-sw button:hover { background: var(--paper-2); color: var(--ink); }
+.theme-sw button.active { background: var(--ink); color: var(--paper); }
+@media (max-width: 600px) {
+  .metabar .status { display: none; }
+  .metabar-left .chip:nth-of-type(2) { display: none; }
+}
+/* page */
+.brief {
+  max-width: var(--measure); margin: 0 auto;
+  padding: calc(var(--lh) * 2) 2ch calc(var(--lh) * 4);
+}
+/* hero */
+.brief-hero {
+  margin-bottom: calc(var(--lh) * 1.5);
+  border-bottom: 1px solid var(--rule); padding-bottom: var(--lh);
+}
+.brief-kicker {
+  font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ink-3); margin: 0 0 0.5rem;
+}
+.brief-title { font-size: 2rem; line-height: calc(var(--lh) * 2);
+               margin: 0 0 calc(var(--lh) * 0.5); }
+.brief-subtitle { color: var(--ink-2); margin: 0 0 var(--lh); font-size: 0.9rem; }
+.brief-subtitle code { font-size: 0.9em; }
+.brief-warning {
+  color: var(--ink-2); border-left: 2px solid var(--accent);
+  padding-left: 1.5ch; margin: var(--lh) 0 0; font-size: 0.92rem;
+}
+.brief-fallback {
+  background: var(--warn-bg); color: var(--warn);
+  border: 1px solid var(--rule-2); border-radius: 2px;
+  padding: calc(var(--lh) * 0.5) 1.5ch;
+  margin: 0 0 var(--lh); font-size: 0.9rem;
+}
+/* table of contents */
+.brief-toc {
+  margin: 0 0 calc(var(--lh) * 1.5);
+  padding: var(--lh) 2ch; border: 1px solid var(--rule);
+  background: var(--paper-2);
+}
+.brief-toc-title {
+  font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ink-3); margin-bottom: 0.5rem;
+}
+.brief-toc ol {
+  display: grid; grid-template-columns: repeat(auto-fit,minmax(20ch,1fr));
+  gap: 0 2ch; margin: 0; padding-left: 0; list-style: none;
+}
+.brief-toc li::before { content: ""; }
+.brief-toc a {
+  display: flex; gap: 1ch; padding: 2px 1ch;
+  text-decoration: none; color: var(--ink-2);
+  border-left: 2px solid transparent; margin-left: -1ch;
+}
+.brief-toc a .num { color: var(--ink-3); min-width: 3ch; }
+.brief-toc a:hover { color: var(--ink); background: var(--paper-3);
+                     border-left-color: var(--rule-2); }
+/* sections */
+.brief-goal,
+.brief-section {
+  scroll-margin-top: calc(var(--lh) * 3);
+  margin-bottom: calc(var(--lh) * 1.5);
+  border-top: 1px solid var(--rule); padding-top: var(--lh);
+}
+.brief-goal h2,
+.brief-section h2 {
+  display: flex; gap: 1ch; align-items: baseline; margin: 0 0 var(--lh);
+}
+.brief-goal h2 .n,
+.brief-section h2 .n {
+  color: var(--ink-3); font-weight: 500; font-size: 0.88rem;
+  min-width: 3ch; letter-spacing: 0.05em;
+}
+.brief-empty { color: var(--ink-3); font-style: italic; }
+.brief-more { list-style: none; }
+.brief-more::before { content: "" !important; }
+pre {
+  background: var(--paper-2); border: 1px solid var(--rule);
+  border-radius: 2px; padding: var(--lh) 2ch;
+  overflow-x: auto; font-size: 0.88em;
+  line-height: calc(var(--lh) * 0.9); margin: 0 0 var(--lh);
+}
+.brief-subsections { margin: 0 0 var(--lh); }
+.brief-subsections > summary { cursor: pointer; color: var(--ink-3); padding: 0.25rem 0; }
+.brief-subsections ol { margin: 0.5rem 0 0; padding-left: 3ch; }
+/* section kind variants */
+.brief-section-scope-out {
+  background: var(--paper-2); border-top-color: transparent;
+  border-left: 3px solid var(--rule-2);
+  margin-left: -2ch; padding-left: calc(2ch - 3px); border-radius: 2px;
+}
+.brief-section-risks {
+  background: var(--bad-bg); border-top-color: transparent;
+  border-left: 3px solid var(--bad);
+  margin-left: -2ch; padding-left: calc(2ch - 3px); border-radius: 2px;
+}
+.brief-section-risks h2 .n { color: var(--bad); }
+.brief-section-open-questions {
+  background: var(--paper-2); border-top-color: transparent;
+  border-left: 3px solid var(--accent);
+  margin-left: -2ch; padding-left: calc(2ch - 3px); border-radius: 2px;
+}
+.brief-section-open-questions h2 .n { color: var(--accent); }
+/* provenance */
+.brief-provenance {
+  margin-top: calc(var(--lh) * 2); padding-top: var(--lh);
+  border-top: 1px solid var(--rule);
+  color: var(--ink-3); font-size: 0.85rem;
+}
+.brief-provenance p { margin: 0 0 0.5rem; }
+.brief-provenance a { color: var(--ink-2); }
+.brief-provenance code { font-size: 0.9em; }
+@media print {
+  .progress,.metabar { display: none; }
+  .brief { max-width: none; padding: 0; }
+  .brief-goal,.brief-section { break-inside: avoid; }
+}</style>
+</head>
+<body>
+<div class="progress" aria-hidden="true"><i id="pb"></i></div>
+<header class="metabar">
+<div class="metabar-row">
+<div class="metabar-left">
+<span class="brand">field-record</span>
+<span class="chip">v<b>v0.3</b></span>
+<span class="chip">2026-05-29</span>
+</div>
+<div class="metabar-right">
+<span class="status">brief</span>
+<span class="theme-sw" role="group" aria-label="Theme">
+<button data-v="light" title="Light">&#9728;</button>
+<button data-v="dark" title="Dark">&#9790;</button>
+<button data-v="auto" title="System" class="active">&#9680;</button>
+</span>
+</div>
+</div>
+</header>
+<main class="brief">
+<header class="brief-hero">
+<p class="brief-kicker">Brief — derivative summary</p>
+<h1 class="brief-title">Field Record — SPEC v0.3</h1>
+<p class="brief-subtitle">
+<code>field-record</code> ·
+ Version v0.3 ·
+ Published <time>2026-05-29T19:45:13.727Z</time> ·
+ <a href="./SPEC.md">canonical SPEC.md →</a>
+</p>
+<p class="brief-warning">
+Summary, not the spec. Skim this for shape, architecture, scope, risks, decisions, and open questions in 5–10 minutes; consult <a href="./SPEC.md">SPEC.md</a> for the full text.
+</p>
+</header>
+<nav class="brief-toc">
+<div class="brief-toc-title">In this brief</div>
+<ol>
+<li><a href="#s-goal"><span class="num">01</span><span>Goal</span></a></li>
+<li><a href="#s-1-goal-why-it-s-needed"><span class="num">02</span><span>1. Goal &amp; why it&#39;s needed</span></a></li>
+<li><a href="#s-2-v0-1-scope-decisions-interview-resolutions"><span class="num">03</span><span>2. v0.1 scope decisions (interview resolutions)</span></a></li>
+<li><a href="#s-3-user-stories"><span class="num">04</span><span>3. User stories</span></a></li>
+<li><a href="#s-4-architecture"><span class="num">05</span><span>4. Architecture</span></a></li>
+<li><a href="#s-5-implementation-details-data-flow-state-transitions-algorithms"><span class="num">06</span><span>5. Implementation details (data flow, state transitions, algorithms)</span></a></li>
+<li><a href="#s-6-tests-plan-ci-red-green-tdd"><span class="num">07</span><span>6. Tests plan (CI + Red/Green TDD)</span></a></li>
+<li><a href="#s-7-team-veteran-experts-to-hire"><span class="num">08</span><span>7. Team (veteran experts to hire)</span></a></li>
+<li><a href="#s-8-implementation-plan-sprints-ordering-parallelization"><span class="num">09</span><span>8. Implementation plan (sprints, ordering, parallelization)</span></a></li>
+<li><a href="#s-9-users-roles-permissions"><span class="num">10</span><span>9. Users, roles &amp; permissions</span></a></li>
+<li><a href="#s-10-record-modules"><span class="num">11</span><span>10. Record modules</span></a></li>
+<li><a href="#s-11-admin-console"><span class="num">12</span><span>11. Admin console</span></a></li>
+<li><a href="#s-12-reporting-dashboard"><span class="num">13</span><span>12. Reporting &amp; dashboard</span></a></li>
+<li><a href="#s-13-security-data-protection-auth-hardening"><span class="num">14</span><span>13. Security, data protection &amp; auth hardening</span></a></li>
+<li><a href="#s-14-backup-recovery-durability-dr"><span class="num">15</span><span>14. Backup, recovery &amp; durability (DR)</span></a></li>
+<li><a href="#s-15-embedded-changelog"><span class="num">16</span><span>15. Embedded Changelog</span></a></li>
+</ol>
+</nav>
+<section class="brief-goal" id="s-goal">
+<h2><span class="n">01</span><span>Goal</span></h2>
+<p>&gt; Status: lead revision (v0.3) after the v0.2 security/ops-weighted review round (two independent reviewers: a paranoid security/ops pass and a correctness/workflow pass). All fourteen findings this round were accepted and applied. Persona: Veteran Agricultural Software Engineer.</p>
+</section>
+<section class="brief-section brief-section-generic" id="s-1-goal-why-it-s-needed">
+<h2><span class="n">02</span><span>1. Goal &amp; why it&#39;s needed</span></h2>
+<p><strong>Goal.</strong> Ship a production farm operations record-keeping system whose field-entry screens stay simple and fast on a phone, while the backend quietly builds a complete, auditable, multi-year database for regulatory compliance, crop history, field reports, dashboards, and office review. The headline target: an operator saves a complete spray or fertilizer record in <strong>under 60 seconds</strong> on a phone, even with no cell signal.</p>
+<p><strong>Why this exists.</strong> Farms today record sprays, fertilizer, fuel, harvest loads, irrigation, and inbound/outbound tickets on paper, in trucks, at pivots — places with bad or no service. Paper records are slow to enter, easy to lose, and nearly impossible to audit years later when a restricted-use-pesticide (RUP) compliance question or a crop-history dispute arises. Existing software fails the opposite way: it demands so much data up front that operators stop using it in the field. Field Record exists to resolve that exact tension — <strong>fast field entry that operators actually use, backed by a record complete enough to satisfy a regulator, an auditor, or an insurance adjuster a decade later.</strong> A click-through prototype (<code>index.html</code> / <code>styles.css</code> / <code>app.js</code>, all mock in-memory state) and <code>BACKEND_HANDOFF.md</code> already prove the flow feels right; this spec defines the production system that replaces the mock state with real auth, storage, offline sync, and an auditable Postgres backend without losing that feel.</p>
+<p><strong>Non-negotiable constraints (product owner).</strong></p>
+<ul>
+<li><strong>Self-hosted Supabase</strong> (Postgres DB, Supabase Auth, Storage, Row-Level Security).</li>
+<li><strong>TypeScript end to end</strong> (frontend + any edge/server code).</li>
+<li><strong>Mobile-first PWA</strong>, installable (&quot;Add to Home Screen&quot;), full-screen, works on iPhone and Android.</li>
+<li><strong>Email + password auth only.</strong> No SSO, magic links, or OAuth providers in scope.</li>
+<li><strong>~10 users</strong> for the first farm, but <strong>multi-tenant-ready</strong> (organization-scoped) from day one.</li>
+<li>An <strong>admin console</strong> for users, fields, equipment, lists, and settings.</li>
+<li><strong>Offline-first</strong> is a core requirement, not a polish item.</li>
+<li class="brief-more">…2 more in SPEC.md</li>
+</ul>
+</section>
+<section class="brief-section brief-section-decisions" id="s-2-v0-1-scope-decisions-interview-resolutions">
+<h2><span class="n">03</span><span>2. v0.1 scope decisions (interview resolutions)</span></h2>
+<p>These five product questions were delegated to the lead. Each resolution is recorded here and mirrored in §15 Changelog and the decisions log.</p>
+<p><strong>2.1 Module scope (<code>v01-module-scope</code>).</strong> v0.1 ships the <strong>foundation</strong> (auth/users/permissions/organizations; admin lists for fields, crop seasons, equipment, users; the universal <code>field_records</code> parent + attachments + audit events; office review + edit lock) <strong>plus two flagship field-entry modules: Spray/RUP and Fertilizer.</strong> Rationale: they share one flow, carry the highest compliance value (RUP), and are the exact records named in the sub-60-second target — so they are the truest test of the core thesis. The remaining six modules (Tillage, Scouting, Harvest, Irrigation, Fuel, Loads) are <strong>fast-follow</strong>, sequenced in §8 after the pilot validates the field-entry feel. The shared parent table and detail-table pattern are built so each fast-follow module is additive, not a rewrite.</p>
+<p><strong>2.2 Offline depth (<code>offline-depth-v01</code>).</strong> v0.1 ships the <strong>full offline write path</strong> for in-scope modules: local IndexedDB write, immediate temporary local ID, save that never blocks on the network, queued attachment upload with retry, background sync, and server-side conflict resolution per the conflict rules. Rationale: offline is the reason the product exists in the field; it cannot be bolted on after the data model and sync envelope are frozen. The only deliberately-thin piece in v0.1 is the <strong>conflict-review UI</strong>, which surfaces conflicts inside the existing office-review queue rather than as a separate console. On-device data is scoped, lifetime-bounded, and wiped on logout/expiry/revocation per §13.6.</p>
+<ul>
+<li><strong>Admin setup</strong> — owner/admin loads real fields, crop seasons, equipment, and users.</li>
+<li><strong>Shadow/dual-entry</strong> — 1–2 operators run Spray/Fertilizer in Field Record <em>alongside</em> their existing method for ~2 weeks, deliberately including no-signal locations, to validate field-entry feel and offline sync. This window is the source of the §2.4 / §6.4 participating-operator pilot metrics.</li>
+<li><strong>Office-review validation</strong> — office role reviews, corrects, and locks real records; confirms the audit trail and weather snapshots are complete and stable.</li>
+<li><strong>Expand</strong> — once the participating-operator §2.4 metric holds against the §6.4 gate <strong>and</strong> the DR restore drill (§14.5) has passed, drop dual entry, onboard all operators, and run a <strong>post-cutover adoption check</strong> (§6.4) confirming farm-wide capture sustains without the dual-entry mandate; then turn on fast-follow modules sprint by sprint.</li>
+</ul>
+</section>
+<section class="brief-section brief-section-generic" id="s-3-user-stories">
+<h2><span class="n">04</span><span>3. User stories</span></h2>
+<p>At least three; used for manual/AI test scenarios. Each is persona → action → outcome.</p>
+<p>---</p>
+<ul>
+<li><strong>Operator, fast spray entry offline.</strong> As an <em>operator standing at a pivot with no signal</em>, I open Field Record from my home screen, pick the field, set pass pattern/heading, add a tank-mix product with its rate, confirm the weather reading (auto-filled if I have signal, or hand-entered / left for automatic back-fill if I don&#39;t — see §5.5), capture a label photo, and tap Save — and the record is saved locally with a &quot;draft / will sync&quot; indicator in under 60 seconds, syncing automatically when I regain signal, <strong>so that</strong> I never lose a record and never wait on the network in the field. The weather snapshot is finalized on sync (§5.5); no network call is required to complete the save.</li>
+<li><strong>Office reviewer, lock with audit.</strong> As an <em>office reviewer</em>, I open the review queue, see a submitted spray record with its weather snapshot and products, correct a mistyped rate, approve, and lock it — and the original value, my correction, and a timestamped, tamper-evident audit event (§13.1) are all preserved, <strong>so that</strong> the record is defensible to a regulator and the operator can no longer silently change it.</li>
+<li><strong>Owner/Admin, manage access and fields.</strong> As an <em>owner/admin</em>, I invite a seasonal employee with operator-only module access and an access-expiration date, add a new field with a crop season, and review a pending GPS boundary draft an operator captured — <strong>so that</strong> the right people can record the right things, field history is anchored to real boundaries, and access expires automatically (enforced live, §13.3) without a hard delete.</li>
+<li><strong>Scout, REI safety (fast-follow module, foundation in v0.1).</strong> As a <em>scout</em>, I open a field&#39;s history and immediately see an REI (re-entry interval) warning derived from the most recent spray&#39;s <strong>entered</strong> REI value, <strong>so that</strong> I don&#39;t send anyone into a treated field too early. <em>(Scouting entry ships in fast-follow; the REI-from-spray data path is established in v0.1, sourced from manually-entered / admin-list REI values per §5.9.)</em></li>
+<li><strong>Owner/Admin, dropdown &quot;Other&quot; without blocking entry.</strong> As an <em>operator</em>, when the product/equipment list is missing what I need, I choose &quot;Other&quot;, type the value, and finish my record immediately; as <em>admin</em>, I later resolve that one-off into the permanent list or keep it one-off — <strong>so that</strong> field entry is never blocked and the dropdowns stay clean.</li>
+</ul>
+</section>
+<section class="brief-section brief-section-architecture" id="s-4-architecture">
+<h2><span class="n">05</span><span>4. Architecture</span></h2>
+<p>&lt;!-- architecture:begin --&gt;</p>
+<p>&lt;!-- architecture:end --&gt;</p>
+<p><strong>Shape:</strong> a single TypeScript PWA talking to self-hosted Supabase, with all multi-tenant and role/permission enforcement pushed into Postgres Row-Level Security (RLS) so the security boundary is the database, not the client.</p>
+<ul>
+<li><strong>Client (PWA).</strong> Renders the prototype&#39;s screen flows; owns the offline store and the optimistic UI. The client is <strong>never trusted for authorization</strong> — it shows/hides UI by cached permissions for UX only. Local data is user/tenant-scoped and wiped on logout/expiry/revocation (§13.6).</li>
+<li><strong>Auth.</strong> Supabase Auth, email+password. JWT carries <code>sub</code> (user) and is mapped to <code>organization_id</code>, role, and module permissions via a <code>user_claims</code>/JWT-hook so RLS policies can read them — but <strong>security-critical checks (active status, access-expiration, current permissions) are re-evaluated against live DB state</strong>, not trusted from the cached claim (§13.3).</li>
+<li><strong>Database (trust boundary).</strong> Every tenant-scoped table carries <code>organization_id</code>; RLS policies enforce tenant isolation <strong>and</strong> role/per-module permissions. Write-side invariants (status transitions, edit-window lock, weight/inches calculations stored alongside overrides) are enforced by Postgres constraints + <code>SECURITY DEFINER</code> RPCs. <strong>RPCs are part of the trust boundary and re-enforce authorization internally (§13.2)</strong> — they do not assume RLS protects them. <code>audit_events</code> is append-only at the privilege level (§13.1).</li>
+<li><strong>Storage.</strong> Attachments uploaded directly (presigned) and linked to a record; storage RLS mirrors table RLS; buckets are backed up off-host (§14.4).</li>
+<li><strong>Edge Functions (TS).</strong> Stateless server logic that must not run on the client: weather-snapshot capture and back-fill (so the stored snapshot is server-time-stamped and stable), bootstrap payload assembly, the sync change-feed/conflict resolver (the authority for ordering, §5.3), and (fast-follow) the OCR + label-lookup pipeline. Edge functions hold the <code>service_role</code>/API keys and restrict ingress (§13.5).</li>
+</ul>
+<pre data-lang="text"><code class="language-text">  ┌───────────────────────────────────┐
+  │ Field operator (phone) (external) │
+  └───────────────────────────────────┘
+  ┌─────────────────────────────────────────────┐
+  │ PWA client (React + TypeScript) (component) │
+  └─────────────────────────────────────────────┘
+  ┌────────────────────────────────────────────────┐
+  │ On-device store (IndexedDB outbox) (datastore) │
+  └────────────────────────────────────────────────┘
+  ┌──────────────────────────────────────────────┐
+  │ Supabase Auth (email + password) (component) │
+  └──────────────────────────────────────────────┘
+  ┌──────────────────────────────────────────────┐
+  │ PostgREST + SECURITY DEFINER RPC (component) │
+  └──────────────────────────────────────────────┘
+  ┌──────────────────────────────────────────────────────────────────────────┐
+  │ Edge Functions (TS): sync resolver, weather, bootstrap, OCR* (component) │
+  └──────────────────────────────────────────────────────────────────────────┘
+  ┌──────────────────────────────────────────────────────────┐
+  │ Postgres — RLS trust boundary, tenant-scoped (datastore) │
+  └──────────────────────────────────────────────────────────┘
+  ┌────────────────────────────────────────────┐
+  │ Supabase Storage (attachments) (datastore) │
+  └────────────────────────────────────────────┘
+  ┌────────────────────────┐
+  │ Weather API (external) │
+  └────────────────────────┘
+  ┌──────────────────────────────────────────────────┐
+  │ EPA PPLS / label source (fast-follow) (external) │
+  └──────────────────────────────────────────────────┘
 
-      <main class="workspace">
-        <section class="phone-stage" aria-label="Clickable phone prototype">
-          <div class="phone-frame">
-            <div class="phone-top">
-              <span>Field Record</span>
-              <span id="mockClock">8:42 AM</span>
-            </div>
-            <div id="app" class="phone-screen" aria-live="polite"></div>
-            <nav class="bottom-nav" aria-label="Phone navigation">
-              <button data-route="home">Home</button>
-              <button data-route="field-history">Fields</button>
-              <button data-route="office-review">Review</button>
-              <button data-route="data-center">Data</button>
-              <button data-route="admin">Admin</button>
-            </nav>
-          </div>
-        </section>
+edges:
+- operator → pwa [field entry]
+- pwa ⇢ idb [offline save]
+- pwa → auth [login]
+- pwa → api [supabase-js / HTTPS]
+- pwa → edge [sync outbox]
+- pwa ⇢ storage [presigned upload]
+- auth ⇒ pg [JWT claims -&gt; RLS]
+- api ⇢ pg [RLS-enforced r/w]
+- edge ⇢ pg [resolver / back-fill]
+- edge → weather [snapshot]
+- edge → ppls [label lookup*]
 
-        <section class="context-panel" aria-label="Prototype notes">
-          <div class="panel-heading">
-            <p class="eyebrow">Click-through prototype</p>
-            <h1>Crop input records without the clutter</h1>
-            <p>
-              This face is built around fast field entry first, with the deeper history,
-              compliance, and dashboard data gathering itself in the background.
-            </p>
-          </div>
-
-          <div class="insight-grid">
-            <article>
-              <span class="mini-label">Entry goal</span>
-              <strong>Save a spray or fertilizer record in under one minute.</strong>
-            </article>
-            <article>
-              <span class="mini-label">Compliance</span>
-              <strong>Keep chemical records, label snapshots, photos, and REI forever.</strong>
-            </article>
-            <article>
-              <span class="mini-label">Maps</span>
-              <strong>Store field boundaries, treated areas, GPS tracks, and pass pattern.</strong>
-            </article>
-            <article>
-              <span class="mini-label">Roles</span>
-              <strong>Operators enter records. Scouts see REI and history. You see the dashboard.</strong>
-            </article>
-          </div>
-
-          <div class="workflow-strip">
-            <span>Field</span>
-            <span>Area</span>
-            <span>Pattern</span>
-            <span>Product</span>
-            <span>Weather</span>
-            <span>Save</span>
-            <span>Fuel</span>
-            <span>Loads</span>
-          </div>
-        </section>
-      </main>
-    </div>
-
-    <script src="app.js?v=20260521-spray-label-ocr"></script>
-  </body>
+notes:
+- Self-hosted Supabase comprises: Supabase Auth, PostgREST + RPC, Edge Function…
+- RLS in Postgres is the authorization trust boundary; the client is never trus…
+- OCR + EPA PPLS label lookup are fast-follow, not v0.1 (marked *).
+- server_seq / updated_at are the authoritative sync-ordering signals (see SS 5…</code></pre>
+</section>
+<section class="brief-section brief-section-generic" id="s-5-implementation-details-data-flow-state-transitions-algorithms">
+<h2><span class="n">06</span><span>5. Implementation details (data flow, state transitions, algorithms)</span></h2>
+<p><strong>5.1 Record lifecycle (status state machine).</strong></p>
+<p><strong>5.1.1 Syncable minimum vs complete record (Spray/Fertilizer).</strong> A record is <strong>submittable/syncable</strong> when it holds its mandatory set; it is <strong>complete</strong> (counts toward the §2.4 metric) when the mandatory set plus resolved weather and any RUP requirements are present.</p>
+<p><strong>5.2 Offline save &amp; sync (client).</strong></p>
+<ul>
+<li><strong><code>submitted_at</code> stamping (offline drafts).</strong> In v0.1 the field-entry &quot;Save&quot; action both persists and <strong>submits</strong> the record (status → <code>submitted</code>) once it holds a <strong>syncable minimum</strong> (§5.1.1), because the prototype&#39;s fast feel is one-tap save. <code>submitted_at</code> is anchored on the operator&#39;s local submit-action time, carried with the draft and <strong>adopted as canonical by the server on first sync</strong>. A record the operator deliberately keeps as an incomplete <code>draft</code> (not submitted) remains editable by its owner <strong>indefinitely</strong> and never auto-locks; such drafts are excluded from office review and from the §2.4 metric until submitted, and surface in the operator&#39;s own &quot;unsubmitted&quot; list once older than a configurable staleness threshold.</li>
+<li><strong>Edit window.</strong> Once submitted, operators may edit <em>their own</em> records while <code>now &lt; submitted_at + edit_window</code> (default 48h, configurable in Settings) <strong>and</strong> status is not <code>locked</code>. Enforced by an RPC + RLS, never client-only.</li>
+<li><strong>Send-back reopens the edit window (deadlock fix).</strong> Office review can take longer than the 48h edit window, so a <code>send_back</code> would otherwise hit a record the operator can no longer edit — a deadlock. On <code>send_back</code> the server stamps a fresh <code>sent_back_at</code>, and the operator may edit their own <code>sent_back</code> record while <code>now &lt; sent_back_at + edit_window</code>, <strong>independent of the original <code>submitted_at</code> window</strong>, until they re-submit (→ <code>submitted</code> → server commit → <code>needs_review</code>) or it is locked. The reopened window is itself bounded by <code>edit_window</code> so a sent-back record cannot stay open forever.</li>
+<li><strong>Lock.</strong> After the window (or explicit office lock), only Admin/Office may unlock or amend. <strong>Amendments never erase original values</strong> — they write a new audit event with <code>old_value_json</code>/<code>new_value_json</code> into the append-only audit log (§13.1).</li>
+<li><strong><code>amended</code> is not terminal.</strong> An <code>amend</code> (admin/office only) writes the corrected values as live, retains originals in audit, and by default returns the record to <code>locked</code>. Successive amendments <strong>stack</strong> — each writes its own audit event and may be applied again to a <code>locked</code> record. When Settings <code>review rules</code> require it, an amendment instead routes back through <code>needs_review</code> for office re-approval before re-locking. Transitions out of <code>amended</code>: <code>amended → locked</code> (default) or <code>amended → needs_review → … → locked</code>.</li>
+<li><strong><code>submitted → needs_review</code> trigger.</strong> Automatic and server-side: when the server <strong>commits</strong> a <code>submitted</code> record (on direct save online, or on sync replay of an offline draft), it enters the office review queue as <code>needs_review</code>. This is a server event, not a client action.</li>
+</ul>
+<pre><code>draft --submit--&gt; submitted --(server commit)--&gt; needs_review
+  needs_review --approve--&gt; approved --lock--&gt; locked
+  needs_review --send_back--&gt; sent_back --(operator edits within reopened window)--&gt; submitted
+  approved/locked --amend(admin/office)--&gt; amended --(re-lock)--&gt; locked
+  amended --(optional, per review rules)--&gt; needs_review --&gt; ... --&gt; locked
+  (any) --stale-draft-vs-locked, two-edit collision, or review-authority guard--&gt; conflict (routed to review)</code></pre>
+</section>
+<section class="brief-section brief-section-generic" id="s-6-tests-plan-ci-red-green-tdd">
+<h2><span class="n">07</span><span>6. Tests plan (CI + Red/Green TDD)</span></h2>
+<p><strong>Methodology.</strong> All new code follows Red/Green/Refactor: write a failing test that states the behavior, write the minimum to pass, then refactor green.</p>
+<p><strong>6.1 Built test-first (RED first, non-negotiable) — the v0.1 correctness core:</strong></p>
+<p><strong>6.2 RLS role × module matrix (enumerated, explicit target).</strong> Because RLS is the named trust boundary, the test suite includes a <strong>generated, enumerated matrix</strong> over all <strong>6 roles</strong> (§9) × in-scope modules (parent + Spray + Fertilizer detail, plus admin lists) × actions (create/read/update/lock/amend/archive), asserting both allow- and <strong>negative</strong>-paths. The matrix exercises <strong>both</strong> the direct PostgREST/RLS path <strong>and</strong> the <code>SECURITY DEFINER</code> RPC path (§13.2), so an RPC cannot become a tenant/permission bypass in front of the boundary it&#39;s meant to protect. Named cases explicitly include: <strong>Scout = create scouting only when permitted</strong> (and cannot create spray/fertilizer), <strong>Temporary/seasonal = access-expiration enforcement</strong> evaluated against <strong>live DB state</strong> (writes refused after expiry even with a still-valid JWT), <strong>suspended/archived-mid-session denied on the next request</strong> (§13.3), View-only = no writes, Operator = edit-own-within-window only. The matrix is a checked-in artifact; adding a fast-follow module extends it.</p>
+<ul>
+<li><strong>RLS / authorization policies.</strong> Tests that assert cross-tenant reads/writes are impossible and that each role + module permission can do exactly what it should and nothing more. (Highest risk; written before any policy.) See §6.2 for the enumerated matrix requirement, including the <strong>RPC paths</strong> and <strong>live-revocation</strong> cases.</li>
+<li><strong>Audit-log immutability (§13.1).</strong> RED tests asserting that **no role — Owner/Admin, Office, operator, <em>or</em> the service_role-backed RPCs — can UPDATE or DELETE an <code>audit_events</code> row**; inserts succeed only through the audit RPC/trigger. Where a hash-chain is used, a test asserts a broken chain is detectable.</li>
+<li><strong>Record status state machine, edit-window lock &amp; send-back/amend.</strong> Tests for every transition in §5.1, including &quot;operator cannot edit after window&quot;, &quot;<strong>send_back reopens the window so a sent_back record is editable past the original 48h</strong>&quot;, &quot;amend preserves original&quot;, &quot;<strong>amend returns to locked (or needs_review per rules) and successive amendments stack</strong>&quot;, &quot;every edit emits an audit event&quot;, &quot;<code>submitted_at</code> is stamped at submit and adopted canonically on sync&quot;, and &quot;a never-submitted draft stays editable and never auto-locks.&quot;</li>
+<li><strong>Syncable-minimum / complete-record validation (§5.1.1).</strong> Tests that a record below the mandatory set stays <code>draft</code> and cannot submit, and that completeness (incl. resolved weather, RUP fields when flagged) is computed as specified.</li>
+<li><strong>Sync &amp; conflict resolver.</strong> Idempotent draft replay by <code>offline_draft_id</code>; <strong>owner/org binding</strong> — a draft replayed under a different owner/org is rejected and a colliding <code>draft_id</code> cannot clobber another owner&#39;s/tenant&#39;s row (cross-owner &amp; cross-tenant collision tests); <strong>server-ordering authority</strong> — a stale-clock device draft (old <code>client_action_at</code>) does <strong>not</strong> overwrite a newer server-committed edit; two-edit &quot;keep server-latest, log both&quot;; <strong>review-authority guard</strong> — an older operator draft against an approved/corrected/locked record routes to <code>conflict</code> instead of winning; stale-draft-vs-locked → <code>conflict</code>.</li>
+<li><strong>Sync failure &amp; recovery (§6.3).</strong> Explicit RED tests for the <code>sync_failed</code> path.</li>
+<li><strong>On-device store lifecycle (§13.6).</strong> Tests that the local store/outbox is wiped on logout and on detected expiry/revocation, and that local data is scoped to the authenticated user/tenant.</li>
+<li class="brief-more">…1 more in SPEC.md</li>
+</ul>
+</section>
+<section class="brief-section brief-section-generic" id="s-7-team-veteran-experts-to-hire">
+<h2><span class="n">08</span><span>7. Team (veteran experts to hire)</span></h2>
+<p>---</p>
+<ul>
+<li><strong>Veteran Postgres / RLS data engineer (1)</strong> — schema, multi-tenant RLS, audit triggers + <strong>append-only audit enforcement (§13.1)</strong>, soft-archive, reporting views, and the <strong>backup/PITR/DR runbook + restore drills (§14)</strong>. Owns the trust boundary and the §6.2 matrix.</li>
+<li><strong>Veteran TypeScript backend / Supabase edge engineer (1)</strong> — RPCs (with per-RPC authorization + fixed search_path, §13.2), sync resolver (server-ordering authority + review-authority guard + owner/org binding), bootstrap, weather snapshot fetch + back-fill, secrets/<code>service_role</code> isolation (§13.5), (fast-follow) OCR/label pipeline.</li>
+<li><strong>Veteran offline-first PWA engineer (1)</strong> — service worker, IndexedDB store, outbox/sync engine, sync-failed recovery, <strong>on-device scoping + store-wipe on logout/expiry (§13.6)</strong>, install/&quot;Add to Home Screen&quot;, attachment upload queue.</li>
+<li><strong>Veteran mobile-first frontend engineer (React/TS) (1)</strong> — field-entry flows that preserve the prototype feel, sync-state vs status UI, admin console.</li>
+<li><strong>Veteran agricultural domain SME / product owner proxy (1, part-time)</strong> — RUP/REI/PHI correctness, irrigation source-of-truth, units &amp; bushel weights, real field/equipment/crop-season data, pilot liaison and dual-entry log reconciliation.</li>
+<li><strong>Veteran QA / test-automation engineer (1)</strong> — Red/Green discipline, RLS matrix harness (incl. RPC paths + live revocation), audit-immutability &amp; owner/org-collision tests, sync-failure tests, success-metric instrumentation, AI/browser E2E scenarios + evidence.</li>
+<li><strong>Veteran security / SRE reviewer (1, part-time)</strong> — auth hardening (§13.4), RLS, storage policy, secrets/key rotation, on-device exposure, and DR/restore-drill sign-off (§14); REV-style secrets review per MR. Owns §13/§14 sign-off.</li>
+</ul>
+</section>
+<section class="brief-section brief-section-generic" id="s-8-implementation-plan-sprints-ordering-parallelization">
+<h2><span class="n">09</span><span>8. Implementation plan (sprints, ordering, parallelization)</span></h2>
+<p>Ordering follows the idea&#39;s build order, adapted to the v0.1 scope decisions. Parallel tracks noted as <strong>[A]/[B]/[C]</strong>.</p>
+<p><strong>Sprint 0 — Foundations &amp; contracts (all hands).</strong> Repo, CI (tsc/lint/Vitest), self-hosted Supabase dev env, migration tooling, <strong>secrets management / <code>service_role</code> isolation set up (§13.5)</strong>, a <strong>backup/PITR baseline + first restore drill scaffold (§14)</strong>, the <strong>sync envelope contract</strong> (<code>offline_draft_id</code> with owner/org binding, <code>source_device_id</code>, advisory <code>client_action_at</code>, authoritative <code>server_seq</code>/<code>updated_at</code>) and the <strong>status state machine + sync-state axis</strong> frozen as written specs + failing tests. Deliverable: green CI on empty project, agreed contracts.</p>
+<p><strong>Sprint 1 — Identity, tenancy, RLS [A: data eng] ∥ PWA shell [B: PWA eng] ∥ design-system port [C: frontend].</strong></p>
+<ul>
+<li>[A] organizations, users, user_roles, user_permissions, user_status_events, rup_credentials; RLS policies + the §6.2 enumerated matrix (built test-first), incl. <strong>RPC re-authorization + fixed search_path (§13.2)</strong> and <strong>live-revocation helpers (§13.3)</strong>. Email+password auth wired with <strong>auth hardening (rate-limit/lockout, password policy, email verification, §13.4)</strong>; access-expiration enforced live.</li>
+<li>[B] PWA app shell, service worker, IndexedDB store skeleton (user/tenant-scoped), install support.</li>
+<li>[C] Port prototype styles into the component system (mobile-first).</li>
+</ul>
+</section>
+<section class="brief-section brief-section-generic" id="s-9-users-roles-permissions">
+<h2><span class="n">10</span><span>9. Users, roles &amp; permissions</span></h2>
+<p>Role <strong>+ per-module permissions</strong> (not one broad role). Roles: Owner/Admin (full), Office review (approve/send-back/correct/lock), Employee/operator (create the field records; edit own within the window), Scout (view history + REI; create scouting only when permitted), View only (read allowed records), Temporary/seasonal (limited modules + access-expiration date). Status lifecycle: invited → active → suspended → archived (soft archive; never hard-delete). All enforced in Postgres RLS, with <strong>security-critical checks (active status, access-expiration, current permissions) evaluated against live DB state, not cached JWT claims (§13.3)</strong>, and the full 6-role × module × action matrix (incl. negative paths, Scout-only-scouting, access-expiration, suspended-mid-session, and RPC paths) an explicit enumerated test target (§6.2).</p>
+</section>
+<section class="brief-section brief-section-generic" id="s-10-record-modules">
+<h2><span class="n">11</span><span>10. Record modules</span></h2>
+<p>v0.1: <strong>Spray/RUP</strong> and <strong>Fertilizer</strong> (see §5, §8 Sprint 4). Fast-follow: <strong>Tillage, Scouting, Harvest, Irrigation, Fuel, Loads</strong> — each as specified in the idea (flows, fields, calculations in §5.4, built test-first in their sprint), built additively on <code>field_records</code>. Loads office actions: inbound closed = &quot;Bill entered&quot;, outbound closed = &quot;Invoiced&quot;; any accounting export is post-office-review only.</p>
+</section>
+<section class="brief-section brief-section-generic" id="s-11-admin-console">
+<h2><span class="n">12</span><span>11. Admin console</span></h2>
+<p>Sections: Users, Fields (bank, boundaries, crop seasons, GPS boundary drafts, irrigation setup), Equipment, Fuel (inventory + deliveries/adjustments), Loads (billing units + settings), Lists (resolve &quot;Other&quot; requests), Alerts (scout reports + recap settings), Settings (edit window, retention, review rules). v0.1 builds Users/Fields/Equipment/Lists/Settings (incl. admin product list with REI/PHI defaults); Fuel/Loads/Alerts admin land with their fast-follow modules.</p>
+</section>
+<section class="brief-section brief-section-generic" id="s-12-reporting-dashboard">
+<h2><span class="n">13</span><span>12. Reporting &amp; dashboard</span></h2>
+<p>Built from structured tables (never scraped text). v0.1 establishes the reporting <strong>views</strong> for in-scope data: field history by field+crop year, RUP/spray report, and the REI-warning data path (computed from entered/admin-sourced REI per §5.9, labeled &quot;based on entered REI&quot;). Fast-follow adds crop-year report, fuel/harvest/irrigation/loads rollups, daily recap + alert feed. Every record is printable/exportable later.</p>
+<p>---</p>
+</section>
+<section class="brief-section brief-section-generic" id="s-13-security-data-protection-auth-hardening">
+<h2><span class="n">14</span><span>13. Security, data protection &amp; auth hardening</span></h2>
+<p><strong>13.1 Audit-log immutability (tamper-evidence).</strong> The compliance claim — a record defensible to a regulator a decade later — requires that the audit trail cannot be altered by the same roles that can amend records. <code>audit_events</code> is <strong>privilege-level append-only</strong>: the table grants <strong>INSERT only</strong> (via the audit RPC/trigger) and <strong>no role — Owner/Admin, Office, operator, or any <code>service_role</code>-backed RPC — holds UPDATE or DELETE</strong>. A BEFORE UPDATE/DELETE trigger raises an exception as defense-in-depth. Recommended: a per-row <code>prev_hash</code> hash-chain so any out-of-band tampering at the storage layer is detectable. Soft-archive/retention never deletes audit rows. Tested in §6.1.</p>
+<p><strong>13.2 SECURITY DEFINER RPC discipline.</strong> <code>SECURITY DEFINER</code> functions execute with owner privileges and bypass RLS by design, so every such RPC is treated as part of the trust boundary and <strong>independently re-enforces authorization</strong>: (a) re-derives <code>organization_id</code> and role/permissions from <code>auth.uid()</code>/claims <strong>and</strong> re-checks them against live DB state (§13.3); (b) validates the <strong>target row&#39;s <code>organization_id</code> matches the caller&#39;s org</strong> before any write; (c) <strong>pins <code>search_path</code></strong> (e.g. <code>pg_catalog, public</code> or empty) to prevent function-hijack; (d) runs as a dedicated least-privilege owner role, not superuser. The §6.2 matrix exercises the RPC paths for cross-tenant and out-of-permission writes, not just direct PostgREST/RLS.</p>
+<p><strong>13.3 Token lifecycle &amp; live revocation.</strong> Access tokens are short-lived (≤ ~60 min) with rotating refresh tokens. <strong>Security-critical checks — user status = active, access-expiration not passed, current role/permission — are evaluated against live DB state inside RLS policies / RPCs</strong> (via helper functions reading <code>users</code>, <code>user_permissions</code>, <code>user_status_events</code>), <strong>not trusted from cached JWT claims</strong>, which serve only as a UX/convenience hint for these. Consequently suspension, archival, role downgrade, permission revocation, and seasonal access-expiration take effect on the <strong>next request</strong>, not on token refresh. Negative tests assert suspended-mid-session and expired-mid-session are denied on the next write (§6.2).</p>
+</section>
+<section class="brief-section brief-section-generic" id="s-14-backup-recovery-durability-dr">
+<h2><span class="n">15</span><span>14. Backup, recovery &amp; durability (DR)</span></h2>
+<p><strong>14.1 Why.</strong> The multi-year auditable database is the product&#39;s reason to exist; self-hosting Supabase means the team owns durability. A single VM disk failure, bad migration, or fat-fingered admin must not lose the compliance DB. (The client never-drop guarantee covers the phone, not the server.)</p>
+<p><strong>14.2 Postgres backups + PITR.</strong> Continuous WAL archiving + scheduled (≥ nightly) base backups enabling <strong>point-in-time recovery</strong>. Backup retention meets the regulatory horizon (multi-year; aligned with the Settings retention rule).</p>
+<p><strong>14.3 Off-host / off-site copies.</strong> Backups are copied <strong>off the application VM</strong> to a separate provider/region and are <strong>encrypted at rest and in transit</strong>.</p>
+</section>
+<section class="brief-section brief-section-generic" id="s-15-embedded-changelog">
+<h2><span class="n">16</span><span>15. Embedded Changelog</span></h2>
+<ul>
+<li><strong>v0.3</strong> — Security/ops-weighted review round (two reviewers). Accepted and applied all fourteen findings: (1) added §13.1 audit-log privilege-level append-only + immutability tests; (2) added §14 backup/PITR/off-site/restore-drill DR plan with a restore drill as a pilot acceptance gate; (3) §13.2 + §4 require SECURITY DEFINER RPCs to re-enforce org/role authorization, validate target-row org, and pin search_path, and §6.2 now exercises RPC paths; (4) §13.3 defines token TTL/refresh and that status/expiry/permission checks read live DB state, with suspended/expired-mid-session negative tests; (5) §13.6 specifies on-device scoping, store-wipe on logout/expiry/revocation, bounded local lifetime, and device-loss stance; (6) §5.2 binds offline_draft_id to (org, owner) and rejects ownership/tenant-changing replays, with collision tests in §6.1; (7) moved harvest/loads/irrigation/fuel math out of the v0.1 test-first core into their fast-follow sprints (§6.1, §5.4 note); (8) §5.3 adds a review-authority guard so an older operator draft cannot silently supersede an approved/corrected/locked record (routes to conflict); (9) §13.4 + §13.5 add auth hardening (rate-limit/lockout, password policy, email verification, leaked-password) and secrets/service_role isolation + rotation; (10) §5.1 makes send_back reopen the edit window (sent_back_at) to fix the 48h deadlock; (11) §2.4/§6.4 reconcile the adoption metric as per-participating-operator during dual entry plus a post-cutover farm-wide adoption check; (12) §6.4 defines entry-start as field-selection-on-a-fresh-record (not screen-open/first-keystroke); (13) §5.1.1 enumerates the syncable-minimum vs complete field sets for Spray and Fertilizer; (14) §5.1 defines amended as non-terminal (amend → locked by default, or → needs_review per rules; amendments stack). Added §13 and §14; renumbered the changelog to §15.</li>
+<li><strong>v0.2</strong> — Reviewer B round (Reviewer A unavailable). Resolved all ten findings: filled the §4 architecture block; resolved the offline-vs-network weather contradiction (§5.5 two-path acquisition + reworded story 1); defined latest in §5.3 as server-assigned server_seq/commit order; specified irrigation source-of-truth + zero-guard; replaced single-E2E metric validation with §6.4 pilot-data sampling and a ≥30-save/≥2-operator gate; defined submitted_at stamping and never-auto-lock drafts; clarified v0.1 REI source as manual/admin-list with unknown≠safe labeling; split record status from sync state and renamed the sync needs_review label to conflict; made the 6-role × module × action RLS matrix an enumerated checked-in target; specified and tested sync_failed recovery.</li>
+<li><strong>v0.1</strong> — Initial lead draft. Established goal/why, architecture (PWA + self-hosted Supabase, RLS as trust boundary), universal record + typed detail abstraction, offline sync envelope &amp; conflict rules, record state machine &amp; edit-lock, domain calculations, test plan with test-first core, team, and 6-sprint plan + fast-follow. Resolved five interview decisions: v0.1 ships foundation + Spray/RUP + Fertilizer (other six modules fast-follow); full offline write/sync for in-scope modules; manual entry + OCR data contract + photo capture in v0.1, OCR extraction/label-lookup deferred; success metric = median spray/fertilizer save &lt; 60s AND ≥90% of applications captured during pilot; phased pilot (admin setup → dual-entry shadow → office-review validation → expand).</li>
+</ul>
+</section>
+<footer class="brief-provenance">
+<p>
+Generated by <code>samospec brief field-record</code> on <time>2026-05-29T19:45:23.125Z</time>.
+ 3 review rounds —
+ lead —,
+ reviewers — +
+ —.
+</p>
+<p>Re-run after each <code>samospec publish</code> to refresh. Canonical document: <a href="./SPEC.md">SPEC.md</a>.</p>
+</footer>
+</main>
+<script>(function(){
+var r=document.documentElement,bs=document.querySelectorAll('.theme-sw button');
+var s=localStorage.getItem('brief-theme')||'auto';
+function apply(v){r.dataset.theme=v==='auto'?'':v;
+  bs.forEach(function(b){b.classList.toggle('active',b.dataset.v===v);});}
+apply(s);
+bs.forEach(function(b){b.addEventListener('click',function(){
+  var v=b.dataset.v||'auto';localStorage.setItem('brief-theme',v);apply(v);});});
+var bar=document.getElementById('pb');
+if(bar){var upd=function(){var m=document.body.scrollHeight-window.innerHeight;
+  bar.style.width=(m>0?window.scrollY/m*100:0)+'%';};
+  window.addEventListener('scroll',upd,{passive:true});upd();}
+})();</script>
+</body>
 </html>
